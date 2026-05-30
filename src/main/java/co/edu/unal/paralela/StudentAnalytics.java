@@ -17,7 +17,7 @@ public final class StudentAnalytics {
      */
     public double averageAgeOfEnrolledStudentsImperative(
             final Student[] studentArray) {
-        List<Student> activeStudents = new ArrayList<Student>();
+        List<Student> activeStudents = new ArrayList<>();
 
         for (Student s : studentArray) {
             if (s.checkIsCurrent()) {
@@ -100,11 +100,16 @@ public final class StudentAnalytics {
      */
     public String mostCommonFirstNameOfInactiveStudentsParallelStream(final Student[] studentArray) throws UnsupportedOperationException {
 
-        List<Student> inactiveStudents = Stream.of(studentArray).parallel().filter(s -> !s.checkIsCurrent()).collect(Collectors.toList());
-
-        Map<String, Long> nameCounts = inactiveStudents.parallelStream().collect(Collectors.groupingBy(Student::getFirstName, Collectors.counting()));
-
-        String mostCommon = nameCounts.entrySet().parallelStream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
+        String mostCommon = Stream.of(studentArray)
+                .parallel()
+                .filter(s -> !s.checkIsCurrent())
+                .collect(Collectors.groupingBy(
+                        Student::getFirstName, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
 
         return mostCommon;
     }
@@ -141,11 +146,11 @@ public final class StudentAnalytics {
      */
   public int countNumberOfFailedStudentsOlderThan20ParallelStream(final Student[] studentArray) throws UnsupportedOperationException {
 
-      int count = 0;
+      int count;
 
-        count = (int) Stream.of(studentArray).parallel().filter(s -> !s.checkIsCurrent() && s.getAge() > 20 && s.getGrade() < 65).count();
+      count = (int) Stream.of(studentArray).parallel().filter(s -> !s.checkIsCurrent() && s.getAge() > 20 && s.getGrade() < 65).count();
 
-        return count;
+      return count;
 
     }
 }
